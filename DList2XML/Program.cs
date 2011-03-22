@@ -85,8 +85,11 @@ namespace DList2XML
 
                 ProcessDirectory(InputDirectory);
 
-                ClearCurrentConsoleLine();
-                Console.WriteLine(string.Format("Found {0} files.", filelist.Count));
+                if (Verbose == true)
+                {
+                    ClearCurrentConsoleLine();
+                    Console.WriteLine(string.Format("Found {0} files.", filelist.Count));
+                }
 
                 ProcessFileList();
 
@@ -100,8 +103,11 @@ namespace DList2XML
         // that are found, and process the files they contain.
         public static void ProcessDirectory(string targetDirectory)
         {
-            ClearCurrentConsoleLine();
-            Console.Write(string.Format("Processing directory: {0}", targetDirectory));
+            if (Verbose == true)
+            {
+                ClearCurrentConsoleLine();
+                Console.Write(string.Format("Processing directory: {0}", targetDirectory));
+            }
             //Console.SetCursorPosition(0, Console.CursorTop - 1);
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
@@ -136,6 +142,14 @@ namespace DList2XML
             using (XmlWriter writer = XmlWriter.Create(OutputFile, settings))
             {
                 writer.WriteStartElement("FileListing");
+                writer.WriteStartElement("RunOptions");
+                writer.WriteElementString("InputDirectory", InputDirectory);
+                writer.WriteElementString("OutputFile", OutputFile);
+                writer.WriteElementString("OutputFileOverWrite", OverwriteOutput.ToString());
+                writer.WriteElementString("Recursive", Recursive.ToString());
+                writer.WriteElementString("Verbose", Verbose.ToString());
+                writer.WriteElementString("RanTime", DateTime.Now.ToUniversalTime().ToString());
+                writer.WriteEndElement();
 
                 for (int fileindex = 0; fileindex < filelist.Count; fileindex++)
                 {
@@ -157,7 +171,7 @@ namespace DList2XML
                 writer.Flush();
             }
 
-            Console.WriteLine(string.Format("total size: {0} bytes.", totalsize.ToString()));
+            //Console.WriteLine(string.Format("total size: {0} bytes.", totalsize.ToString()));
         }
 
         private static void DisplayHelp(bool bExit)
